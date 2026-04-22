@@ -3,10 +3,1110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ArchMind</title>
+    <title>ArchMind — AI-Powered Architecture Advisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --bg-elevated: #111936;
+        --bg-soft: #172247;
+        --border: #223068;
+        --text: #e6ecff;
+        --text-muted: #9aa7d1;
+        --accent: #4f8cff;
+        --accent-strong: #2f6bff;
+        --accent-soft: rgba(79, 140, 255, 0.14);
+        --danger: #ef4444;
+        --warning: #facc15;
+        --success: #22c55e;
+        --radius: 12px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(
+            1200px 600px at 15% -10%,
+            rgba(79, 140, 255, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 500px at 110% 10%,
+            rgba(47, 107, 255, 0.12),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+
+      header.hero {
+        text-align: center;
+        margin-bottom: 36px;
+      }
+
+      header.hero h1 {
+        font-size: clamp(40px, 6vw, 64px);
+        font-weight: 800;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #e6ecff 0%, #4f8cff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      header.hero p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: clamp(16px, 1.6vw, 18px);
+      }
+
+      .card {
+        background: linear-gradient(
+          180deg,
+          var(--bg-elevated) 0%,
+          rgba(17, 25, 54, 0.85) 100%
+        );
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .input-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      label.input-label {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 160px;
+        padding: 16px;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.5;
+        resize: vertical;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft);
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        color: #fff;
+        border: none;
+        padding: 14px 28px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        box-shadow: 0 8px 20px rgba(47, 107, 255, 0.35);
+      }
+
+      button.primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(47, 107, 255, 0.45);
+      }
+
+      button.primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .loading.active {
+        display: inline-flex;
+      }
+
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(230, 236, 255, 0.25);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        display: none;
+        margin-top: 16px;
+        padding: 14px 16px;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        color: #fecaca;
+        border-radius: var(--radius);
+        font-size: 14px;
+      }
+
+      .error.active {
+        display: block;
+      }
+
+      .results {
+        display: none;
+        margin-top: 32px;
+      }
+
+      .results.active {
+        display: block;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 6px;
+        margin-bottom: 20px;
+      }
+
+      .tab-btn {
+        flex: 1 1 140px;
+        padding: 10px 14px;
+        background: transparent;
+        color: var(--text-muted);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s ease, color 0.2s ease;
+      }
+
+      .tab-btn:hover {
+        color: var(--text);
+      }
+
+      .tab-btn.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .tab-panel {
+        display: none;
+        animation: fadeIn 0.25s ease;
+      }
+
+      .tab-panel.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h2.section-title {
+        margin: 0 0 16px;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .summary-item {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+      }
+
+      .summary-item .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+
+      .summary-item .value {
+        font-size: 15px;
+        font-weight: 500;
+        word-break: break-word;
+      }
+
+      .chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      .chip {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .rec-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .rec-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .rec-card h3 {
+        margin: 0;
+        font-size: 18px;
+        color: var(--accent);
+      }
+
+      .rec-card .muted {
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      .pros-cons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .pros-cons h4 {
+        margin: 0 0 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .pros h4 {
+        color: var(--success);
+      }
+
+      .cons h4 {
+        color: var(--danger);
+      }
+
+      ul.clean {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .matrix-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+
+      table.matrix {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      table.matrix th,
+      table.matrix td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      table.matrix thead th {
+        background: var(--bg-soft);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+      }
+
+      table.matrix tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.matrix tbody tr.winner {
+        background: rgba(34, 197, 94, 0.08);
+      }
+
+      .winner-banner {
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        border-radius: var(--radius);
+        font-size: 14px;
+        color: #bbf7d0;
+      }
+
+      .timeline {
+        position: relative;
+        padding-left: 28px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background: var(--border);
+      }
+
+      .phase {
+        position: relative;
+        margin-bottom: 18px;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+
+      .phase::before {
+        content: "";
+        position: absolute;
+        left: -23px;
+        top: 22px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft);
+      }
+
+      .phase h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+
+      .phase .phase-meta {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .phase .phase-lists {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .badge.high {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+      }
+
+      .badge.medium {
+        background: rgba(250, 204, 21, 0.15);
+        color: #fde68a;
+        border: 1px solid rgba(250, 204, 21, 0.35);
+      }
+
+      .badge.low {
+        background: rgba(34, 197, 94, 0.15);
+        color: #bbf7d0;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+      }
+
+      .badge.neutral {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid var(--border);
+      }
+
+      .risk-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+
+      .risk-card .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+
+      .risk-card h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .risk-card .mitigation {
+        margin-top: 8px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .overall-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .overall-pill {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+
+      .empty {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 14px;
+      }
+
+      .errors-panel {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        color: #fecaca;
+        font-size: 14px;
+      }
+
+      .errors-panel h4 {
+        margin: 0 0 6px;
+        color: #fca5a5;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 32px 16px 56px;
+        }
+        .actions {
+          justify-content: stretch;
+        }
+        button.primary {
+          width: 100%;
+        }
+        .pros-cons {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>ArchMind</h1>
-    <p>AI-powered multi-agent architecture advisor.</p>
+    <main class="container">
+      <header class="hero">
+        <h1>ArchMind</h1>
+        <p>AI-Powered Architecture Advisor</p>
+      </header>
+
+      <section class="card input-card">
+        <label class="input-label" for="description">Project description</label>
+        <textarea
+          id="description"
+          placeholder="Describe your project... e.g. I am building a food delivery app for 50,000 users, small team of 5 devs, tight budget, using Node.js"
+        ></textarea>
+        <div class="actions">
+          <div class="loading" id="loading" aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
+            <span>Analyzing with 6 agents...</span>
+          </div>
+          <button class="primary" id="analyze-btn" type="button">
+            Analyze Architecture
+          </button>
+        </div>
+        <div class="error" id="error" role="alert"></div>
+      </section>
+
+      <section class="results" id="results" aria-live="polite">
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" data-tab="summary" role="tab">Summary</button>
+          <button class="tab-btn" data-tab="recommendations" role="tab">
+            Recommendations
+          </button>
+          <button class="tab-btn" data-tab="matrix" role="tab">Decision Matrix</button>
+          <button class="tab-btn" data-tab="plan" role="tab">Execution Plan</button>
+          <button class="tab-btn" data-tab="guardrails" role="tab">Guardrails</button>
+          <button class="tab-btn" data-tab="rollback" role="tab">Rollback Plan</button>
+        </div>
+
+        <div id="errors-container"></div>
+
+        <div class="card">
+          <div class="tab-panel active" id="tab-summary" role="tabpanel">
+            <h2 class="section-title">Project Summary</h2>
+            <div id="summary-content"></div>
+          </div>
+          <div class="tab-panel" id="tab-recommendations" role="tabpanel">
+            <h2 class="section-title">Recommendations</h2>
+            <div id="recommendations-content"></div>
+          </div>
+          <div class="tab-panel" id="tab-matrix" role="tabpanel">
+            <h2 class="section-title">Decision Matrix</h2>
+            <div id="matrix-content"></div>
+          </div>
+          <div class="tab-panel" id="tab-plan" role="tabpanel">
+            <h2 class="section-title">Execution Plan</h2>
+            <div id="plan-content"></div>
+          </div>
+          <div class="tab-panel" id="tab-guardrails" role="tabpanel">
+            <h2 class="section-title">Guardrails</h2>
+            <div id="guardrails-content"></div>
+          </div>
+          <div class="tab-panel" id="tab-rollback" role="tabpanel">
+            <h2 class="section-title">Rollback Plan</h2>
+            <div id="rollback-content"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const API_URL = "http://localhost:8000/analyze";
+
+      const $ = (sel) => document.querySelector(sel);
+      const btn = $("#analyze-btn");
+      const textarea = $("#description");
+      const loading = $("#loading");
+      const errorBox = $("#error");
+      const results = $("#results");
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function severityBadge(level) {
+        const normalized = String(level || "").toLowerCase();
+        const cls = ["low", "medium", "high"].includes(normalized)
+          ? normalized
+          : "neutral";
+        const label = level ? String(level).toUpperCase() : "N/A";
+        return `<span class="badge ${cls}">${escapeHtml(label)}</span>`;
+      }
+
+      function chipList(items) {
+        if (!Array.isArray(items) || items.length === 0) {
+          return '<span class="empty">None</span>';
+        }
+        return (
+          '<div class="chip-list">' +
+          items
+            .map((i) => `<span class="chip">${escapeHtml(i)}</span>`)
+            .join("") +
+          "</div>"
+        );
+      }
+
+      function bulletList(items) {
+        if (!Array.isArray(items) || items.length === 0) {
+          return '<span class="empty">None</span>';
+        }
+        return (
+          '<ul class="clean">' +
+          items.map((i) => `<li>${escapeHtml(i)}</li>`).join("") +
+          "</ul>"
+        );
+      }
+
+      function setTab(tabId) {
+        document.querySelectorAll(".tab-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.tab === tabId);
+        });
+        document.querySelectorAll(".tab-panel").forEach((p) => {
+          p.classList.toggle("active", p.id === `tab-${tabId}`);
+        });
+      }
+
+      document.querySelectorAll(".tab-btn").forEach((b) => {
+        b.addEventListener("click", () => setTab(b.dataset.tab));
+      });
+
+      function renderSummary(summary) {
+        const container = $("#summary-content");
+        if (!summary || typeof summary !== "object" || Object.keys(summary).length === 0) {
+          container.innerHTML = '<div class="empty">No summary available.</div>';
+          return;
+        }
+        const items = [];
+        const scalar = (key, label) => {
+          if (summary[key] !== undefined && summary[key] !== null && summary[key] !== "") {
+            items.push(
+              `<div class="summary-item"><div class="label">${escapeHtml(
+                label
+              )}</div><div class="value">${escapeHtml(summary[key])}</div></div>`
+            );
+          }
+        };
+        scalar("project_type", "Project Type");
+        scalar("team_size", "Team Size");
+        scalar("scale_requirement", "Scale");
+        scalar("budget_sensitivity", "Budget Sensitivity");
+
+        if (Array.isArray(summary.existing_stack)) {
+          items.push(
+            `<div class="summary-item"><div class="label">Existing Stack</div><div class="value">${chipList(
+              summary.existing_stack
+            )}</div></div>`
+          );
+        }
+        if (Array.isArray(summary.key_constraints)) {
+          items.push(
+            `<div class="summary-item"><div class="label">Key Constraints</div><div class="value">${chipList(
+              summary.key_constraints
+            )}</div></div>`
+          );
+        }
+        container.innerHTML = `<div class="summary-grid">${items.join("")}</div>`;
+      }
+
+      function renderRecommendations(recs) {
+        const container = $("#recommendations-content");
+        if (!Array.isArray(recs) || recs.length === 0) {
+          container.innerHTML = '<div class="empty">No recommendations available.</div>';
+          return;
+        }
+        container.innerHTML =
+          '<div class="rec-grid">' +
+          recs
+            .map((r) => {
+              const trade = r.trade_offs || {};
+              return `
+                <div class="rec-card">
+                  <h3>${escapeHtml(r.pattern_name || "Unnamed pattern")}</h3>
+                  <div>${escapeHtml(r.why_it_fits || "")}</div>
+                  <div class="muted"><strong>Best for:</strong> ${escapeHtml(
+                    r.best_for || ""
+                  )}</div>
+                  <div class="pros-cons">
+                    <div class="pros">
+                      <h4>Pros</h4>
+                      ${bulletList(trade.pros)}
+                    </div>
+                    <div class="cons">
+                      <h4>Cons</h4>
+                      ${bulletList(trade.cons)}
+                    </div>
+                  </div>
+                </div>`;
+            })
+            .join("") +
+          "</div>";
+      }
+
+      function renderMatrix(matrix) {
+        const container = $("#matrix-content");
+        if (!matrix || !Array.isArray(matrix.matrix) || matrix.matrix.length === 0) {
+          container.innerHTML = '<div class="empty">No decision matrix available.</div>';
+          return;
+        }
+        const rows = matrix.matrix
+          .map((row) => {
+            const isWinner =
+              matrix.winner && row.pattern_name === matrix.winner ? "winner" : "";
+            return `
+              <tr class="${isWinner}">
+                <td><strong>${escapeHtml(row.pattern_name || "")}</strong></td>
+                <td>${severityBadge(row.scalability)}</td>
+                <td>${severityBadge(row.complexity)}</td>
+                <td>${severityBadge(row.cost)}</td>
+                <td>${severityBadge(row.team_fit)}</td>
+                <td>${severityBadge(row.time_to_implement)}</td>
+                <td><strong>${escapeHtml(
+                  row.overall_score !== undefined ? row.overall_score : ""
+                )}</strong></td>
+              </tr>`;
+          })
+          .join("");
+
+        const winnerBanner = matrix.winner
+          ? `<div class="winner-banner"><strong>Winner:</strong> ${escapeHtml(
+              matrix.winner
+            )}${
+              matrix.winner_reason
+                ? ` — ${escapeHtml(matrix.winner_reason)}`
+                : ""
+            }</div>`
+          : "";
+
+        container.innerHTML = `
+          <div class="matrix-table-wrap">
+            <table class="matrix">
+              <thead>
+                <tr>
+                  <th>Pattern</th>
+                  <th>Scalability</th>
+                  <th>Complexity</th>
+                  <th>Cost</th>
+                  <th>Team Fit</th>
+                  <th>Time to Implement</th>
+                  <th>Overall</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          ${winnerBanner}`;
+      }
+
+      function renderPlan(plan) {
+        const container = $("#plan-content");
+        if (!plan || typeof plan !== "object" || Object.keys(plan).length === 0) {
+          container.innerHTML = '<div class="empty">No execution plan available.</div>';
+          return;
+        }
+        const phases = Array.isArray(plan.phases) ? plan.phases : [];
+        const meta = [];
+        if (plan.total_duration)
+          meta.push(
+            `<div class="overall-pill"><strong>Total:</strong> ${escapeHtml(
+              plan.total_duration
+            )}</div>`
+          );
+        if (plan.team_size_needed)
+          meta.push(
+            `<div class="overall-pill"><strong>Team:</strong> ${escapeHtml(
+              plan.team_size_needed
+            )}</div>`
+          );
+        if (Array.isArray(plan.tech_stack) && plan.tech_stack.length)
+          meta.push(
+            `<div class="overall-pill"><strong>Stack:</strong> ${chipList(
+              plan.tech_stack
+            )}</div>`
+          );
+
+        const timeline =
+          phases.length === 0
+            ? '<div class="empty">No phases defined.</div>'
+            : '<div class="timeline">' +
+              phases
+                .map(
+                  (p) => `
+                <div class="phase">
+                  <h3>Phase ${escapeHtml(p.phase_number ?? "")} — ${escapeHtml(
+                    p.phase_name || ""
+                  )}</h3>
+                  <div class="phase-meta">Duration: ${escapeHtml(
+                    p.duration || "—"
+                  )}</div>
+                  <div class="phase-lists">
+                    <div>
+                      <strong>Steps</strong>
+                      ${bulletList(p.steps)}
+                    </div>
+                    <div>
+                      <strong>Deliverables</strong>
+                      ${bulletList(p.deliverables)}
+                    </div>
+                    <div>
+                      <strong>Dependencies</strong>
+                      ${bulletList(p.dependencies)}
+                    </div>
+                  </div>
+                </div>`
+                )
+                .join("") +
+              "</div>";
+
+        container.innerHTML = `
+          <div class="overall-row">${meta.join("")}</div>
+          ${timeline}`;
+      }
+
+      function renderGuardrails(guardrails) {
+        const container = $("#guardrails-content");
+        if (!guardrails || typeof guardrails !== "object" || Object.keys(guardrails).length === 0) {
+          container.innerHTML = '<div class="empty">No guardrails data available.</div>';
+          return;
+        }
+        const overall = `
+          <div class="overall-row">
+            <div class="overall-pill"><strong>Risk level:</strong> ${severityBadge(
+              guardrails.risk_level
+            )}</div>
+            <div class="overall-pill"><strong>Anti-patterns:</strong> ${chipList(
+              guardrails.anti_patterns_detected
+            )}</div>
+            <div class="overall-pill"><strong>Compliance flags:</strong> ${chipList(
+              guardrails.compliance_flags
+            )}</div>
+          </div>`;
+
+        const risks = Array.isArray(guardrails.risks) ? guardrails.risks : [];
+        const riskCards =
+          risks.length === 0
+            ? '<div class="empty">No risks identified.</div>'
+            : risks
+                .map(
+                  (r) => `
+                <div class="risk-card">
+                  <div class="row">
+                    <h3>${escapeHtml(r.risk_name || "Risk")}</h3>
+                    ${severityBadge(r.severity)}
+                  </div>
+                  <div>${escapeHtml(r.description || "")}</div>
+                  <div class="mitigation"><strong>Mitigation:</strong> ${escapeHtml(
+                    r.mitigation || "—"
+                  )}</div>
+                </div>`
+                )
+                .join("");
+
+        const recs =
+          Array.isArray(guardrails.recommendations) && guardrails.recommendations.length
+            ? `<div><strong>Recommendations</strong>${bulletList(
+                guardrails.recommendations
+              )}</div>`
+            : "";
+
+        container.innerHTML = `${overall}${riskCards}${recs}`;
+      }
+
+      function renderRollback(rollback) {
+        const container = $("#rollback-content");
+        if (!rollback || typeof rollback !== "object" || Object.keys(rollback).length === 0) {
+          container.innerHTML = '<div class="empty">No rollback plan available.</div>';
+          return;
+        }
+        const overall = `
+          <div class="overall-row">
+            <div class="overall-pill"><strong>Overall complexity:</strong> ${severityBadge(
+              rollback.overall_rollback_complexity
+            )}</div>
+            <div class="overall-pill"><strong>Emergency contacts:</strong> ${chipList(
+              rollback.emergency_contacts
+            )}</div>
+          </div>`;
+
+        const strategies = Array.isArray(rollback.rollback_strategies)
+          ? rollback.rollback_strategies
+          : [];
+        const phases =
+          strategies.length === 0
+            ? '<div class="empty">No rollback strategies defined.</div>'
+            : '<div class="timeline">' +
+              strategies
+                .map(
+                  (s) => `
+                <div class="phase">
+                  <h3>Phase ${escapeHtml(s.phase_number ?? "")} — ${escapeHtml(
+                    s.phase_name || ""
+                  )}</h3>
+                  <div class="phase-meta">
+                    Recovery time: ${escapeHtml(
+                      s.recovery_time || "—"
+                    )} · Data backup required: ${
+                    s.data_backup_required ? "Yes" : "No"
+                  }
+                  </div>
+                  <div><strong>Trigger:</strong> ${escapeHtml(
+                    s.rollback_trigger || "—"
+                  )}</div>
+                  <div style="margin-top:10px;"><strong>Steps</strong>${bulletList(
+                    s.rollback_steps
+                  )}</div>
+                </div>`
+                )
+                .join("") +
+              "</div>";
+
+        container.innerHTML = `${overall}${phases}`;
+      }
+
+      function renderErrors(errors) {
+        const container = $("#errors-container");
+        if (!errors || typeof errors !== "object" || Object.keys(errors).length === 0) {
+          container.innerHTML = "";
+          return;
+        }
+        const rows = Object.entries(errors)
+          .map(
+            ([agent, message]) =>
+              `<li><strong>${escapeHtml(agent)}:</strong> ${escapeHtml(
+                message
+              )}</li>`
+          )
+          .join("");
+        container.innerHTML = `
+          <div class="errors-panel">
+            <h4>Some agents did not complete</h4>
+            <ul class="clean">${rows}</ul>
+          </div>`;
+      }
+
+      function renderResults(data) {
+        renderErrors(data.errors);
+        renderSummary(data.project_summary);
+        renderRecommendations(data.recommendations);
+        renderMatrix(data.decision_matrix);
+        renderPlan(data.execution_plan);
+        renderGuardrails(data.guardrails);
+        renderRollback(data.rollback_strategies);
+        results.classList.add("active");
+        setTab("summary");
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.classList.add("active");
+      }
+
+      function clearError() {
+        errorBox.textContent = "";
+        errorBox.classList.remove("active");
+      }
+
+      async function analyze() {
+        const description = textarea.value.trim();
+        clearError();
+        if (!description) {
+          showError("Please describe your project before analyzing.");
+          return;
+        }
+
+        btn.disabled = true;
+        loading.classList.add("active");
+        results.classList.remove("active");
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description }),
+          });
+
+          if (!response.ok) {
+            let detail = `Request failed with status ${response.status}`;
+            try {
+              const body = await response.json();
+              if (body && body.detail) detail = body.detail;
+            } catch (_err) {
+              // ignore parse error
+            }
+            showError(detail);
+            return;
+          }
+
+          const data = await response.json();
+          renderResults(data);
+        } catch (err) {
+          showError(
+            "Could not reach the backend. Make sure the API is running at " +
+              API_URL
+          );
+        } finally {
+          btn.disabled = false;
+          loading.classList.remove("active");
+        }
+      }
+
+      btn.addEventListener("click", analyze);
+      textarea.addEventListener("keydown", (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+          analyze();
+        }
+      });
+    </script>
   </body>
 </html>
